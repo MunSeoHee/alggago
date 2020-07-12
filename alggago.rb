@@ -106,7 +106,7 @@ class Alggago < Gosu::Window
       end
     end
   end
-  
+
   def initialize
     super(WIDTH, HEIGHT, false)
     self.caption = '알까고!'
@@ -125,9 +125,9 @@ class Alggago < Gosu::Window
     @can_throw = true
     @players.each do |player|
       player.update
-      player.stones.each do |stone| 
-        @can_throw = false if (stone.body.v.x != 0) or (stone.body.v.y != 0) 
-        if stone.should_delete 
+      player.stones.each do |stone|
+        @can_throw = false if (stone.body.v.x != 0) or (stone.body.v.y != 0)
+        if stone.should_delete
           @space.remove_body(stone.body)
           @space.remove_shape(stone.shape)
           player.number_of_stones -= 1
@@ -136,9 +136,9 @@ class Alggago < Gosu::Window
       end
     end
 
-    @players.each do |player| 
+    @players.each do |player|
       if player.number_of_stones <= 0 and !@gameover
-        @gameover = true 
+        @gameover = true
         @winner = if player.color == "white" then "black" else "white" end
       end
     end
@@ -158,9 +158,9 @@ class Alggago < Gosu::Window
       @font.draw("다음 턴 : #{@player_turn.color}", 720, UI_PIVOT + 40, 1.0, 1.0, 1.0)
 
       @players.each do |player|
-        @font.draw("#{player.color} : #{player.player_name}", 720, 
+        @font.draw("#{player.color} : #{player.player_name}", 720,
                       pivot_font_y_position[player.color], 1.0, 1.0, 1.0)
-        @font.draw("남은 돌 : #{player.number_of_stones}개", 720, 
+        @font.draw("남은 돌 : #{player.number_of_stones}개", 720,
                       pivot_font_y_position[player.color] + 20, 1.0, 1.0, 1.0)
       end
     end
@@ -196,9 +196,9 @@ class Alggago < Gosu::Window
       my_position = @players[my_index].stones.map {|s| [s.body.p.x, s.body.p.y]}
       opposite_position = @players[opposite_index].stones.map {|s| [s.body.p.x, s.body.p.y]}
 
-      number, x_strength, y_strength, message = 
+      number, x_strength, y_strength, message =
           @servers[my_index].call(
-                  "alggago.calculate", 
+                  "alggago.calculate",
                   [my_position] + [opposite_position]
                 )
       puts "\n[BEGIN] MESSAGE FROM AI"
@@ -213,37 +213,37 @@ class Alggago < Gosu::Window
 
   def reduce_speed x, y
     if x*x + y*y > MAX_POWER*MAX_POWER
-      co = MAX_POWER / Math.sqrt(x*x + y*y) 
+      co = MAX_POWER / Math.sqrt(x*x + y*y)
       return x*co, y*co
     else
       return x, y
     end
   end
 
-  def button_down(id) 
+  def button_down(id)
     if @can_throw
-      case id 
-      when Gosu::KbR 
+      case id
+      when Gosu::KbR
         restart
-      when Gosu::KbP 
+      when Gosu::KbP
         pass_turn
-      when Gosu::KbN 
+      when Gosu::KbN
         calculate
       when Gosu::MsLeft
         if !@player_turn.ai_flag and !@gameover
           @player_turn.stones.each do |s|
-            @selected_stone = s if (((s.body.p.x < mouse_x) and 
-                                    (s.body.p.x + STONE_DIAMETER > mouse_x)) and 
-                                    ((s.body.p.y < mouse_y) and 
+            @selected_stone = s if (((s.body.p.x < mouse_x) and
+                                    (s.body.p.x + STONE_DIAMETER > mouse_x)) and
+                                    ((s.body.p.y < mouse_y) and
                                      (s.body.p.y + STONE_DIAMETER > mouse_y)))
           end
         end
-      end 
+      end
     end
   end
 
   def button_up(id)
-    case id 
+    case id
     when Gosu::MsLeft
       if !@selected_stone.nil?
 		@players.each do |player|
@@ -258,7 +258,7 @@ class Alggago < Gosu::Window
         pass_turn
       end
       @selected_stone = nil
-    end 
+    end
   end
 end
 
@@ -271,7 +271,7 @@ class Board
   def draw
     image_resize_ratio = HEIGHT / @image.height.to_f
     @image.draw(0, 0, ZOrder::Board, image_resize_ratio, image_resize_ratio)
-  end 
+  end
 end
 
 class Player
@@ -286,7 +286,7 @@ class Player
 
     num.times { @stones << Stone.new(@color) }
   end
-  
+
   def draw
     @stones.each {|stone| stone.draw}
   end
@@ -294,9 +294,9 @@ class Player
   def update
     @stones.each do |stone|
       stone.update
-      if (stone.body.p.x + STONE_DIAMETER/2.0 > HEIGHT) or 
+      if (stone.body.p.x + STONE_DIAMETER/2.0 > HEIGHT) or
                               (stone.body.p.x + STONE_DIAMETER/2.0 < 0) or
-                              (stone.body.p.y + STONE_DIAMETER/2.0 > HEIGHT) or 
+                              (stone.body.p.y + STONE_DIAMETER/2.0 > HEIGHT) or
                               (stone.body.p.y + STONE_DIAMETER/2.0 < 0)
         stone.should_delete = true
       end
@@ -305,15 +305,15 @@ class Player
 end
 
 class Stone
-  attr_reader :body, :shape 
+  attr_reader :body, :shape
   attr_accessor :should_delete
   def initialize(color)
     @should_delete = false
-    @body = CP::Body.new(1, CP::moment_for_circle(1.0, 0, 1, CP::Vec2.new(0, 0))) 
-    
+    @body = CP::Body.new(1, CP::moment_for_circle(1.0, 0, 1, CP::Vec2.new(0, 0)))
+
     position_y = rand((HEIGHT/2).to_i - 100) + 50
     position_y = position_y + HEIGHT/2.0 if color == "white"
-    @body.p = CP::Vec2.new(rand(HEIGHT - 100) + 50, position_y) 
+    @body.p = CP::Vec2.new(rand(HEIGHT - 100) + 50, position_y)
    #@body.v = CP::Vec2.new(rand(HEIGHT)-HEIGHT/2, rand(HEIGHT)-HEIGHT/2)
 
     @shape = CP::Shape::Circle.new(body, STONE_DIAMETER/2.0, CP::Vec2.new(0, 0))
@@ -342,19 +342,19 @@ class Stone
   def draw
     @stone_body.draw(@body.p.x, @body.p.y, ZOrder::Stone,
                           STONE_DIAMETER/@stone_body.width.to_f, STONE_DIAMETER/@stone_body.height.to_f)
-    @logo_body.draw_rot(@body.p.x + STONE_DIAMETER/2.0, @body.p.y + STONE_DIAMETER/2.0, 
-                          ZOrder::Stone, @body.a.radians_to_gosu, 0.5, 0.5, 
-                          0.85 * (STONE_DIAMETER/@stone_body.width.to_f), 
-                          0.85 * (STONE_DIAMETER/@stone_body.height.to_f), 
+    @logo_body.draw_rot(@body.p.x + STONE_DIAMETER/2.0, @body.p.y + STONE_DIAMETER/2.0,
+                          ZOrder::Stone, @body.a.radians_to_gosu, 0.5, 0.5,
+                          0.85 * (STONE_DIAMETER/@stone_body.width.to_f),
+                          0.85 * (STONE_DIAMETER/@stone_body.height.to_f),
                           0x88ffffff)
-  end 
+  end
 
   private
   def get_reduced_velocity original_velocity, original_velocity_length
     if original_velocity.abs <= BOARD_FRICTION * (original_velocity.abs / original_velocity_length)
-      return 0 
-    else 
-      return (original_velocity.abs / original_velocity) * 
+      return 0
+    else
+      return (original_velocity.abs / original_velocity) *
                 (original_velocity.abs - BOARD_FRICTION * (original_velocity.abs / original_velocity_length))
     end
   end

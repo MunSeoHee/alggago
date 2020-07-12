@@ -1,5 +1,5 @@
-source 'https://rubygems.org' do   
-# Gems here 
+source 'https://rubygems.org' do
+# Gems here
 gem 'chipmunk'
 gem 'gosu'
 gem 'slave'

@@ -1,5 +1,6 @@
 require "xmlrpc/server"
 require "socket"
+require 'json'
 
 s = XMLRPC::Server.new(ARGV[0])
 MAX_NUMBER = 16000
@@ -7,42 +8,48 @@ MAX_NUMBER = 16000
 class MyAlggago
   def calculate(positions)
 
-    #Codes here
-    my_position = positions[0]
-    your_position = positions[1]
+    params = ""
 
-    current_stone_number = 0
-    index = 0
-    min_length = MAX_NUMBER
-    x_length = MAX_NUMBER
-    y_length = MAX_NUMBER
+    params += " #{positions[0].count}"
+    params += " #{positions[1].count}"
 
-    my_position.each do |my|
-      your_position.each do |your|
-
-        x_distance = (my[0] - your[0]).abs
-        y_distance = (my[1] - your[1]).abs
-        
-        current_distance = Math.sqrt(x_distance * x_distance + y_distance * y_distance)
-
-        if min_length > current_distance
-          current_stone_number = index
-          min_length = current_distance
-          x_length = your[0] - my[0]
-          y_length = your[1] - my[1]
-        end
-      end
-      index = index + 1
+    positions[0].each do |coord|
+      params += " #{coord}"
     end
 
-    #Return values
-    message = positions.size
-    stone_number = current_stone_number
-    stone_x_strength = x_length * 5
-    stone_y_strength = y_length * 5
-    return [stone_number, stone_x_strength, stone_y_strength, message]
+    positions[1].each do |coord|
+      params += " #{coord}"
+    end
 
-    #Codes end
+    count = 0
+    my_position_hash = {}
+    positions[0].each do |coord|
+      my_position_hash[count] = coord
+      count += 1
+    end
+
+    count = 0
+    your_position_hash = {}
+    positions[1].each do |coord|
+      your_position_hash[count] = coord
+      count += 1
+    end
+
+    tempHash = {
+        "my_position" => my_position_hash,
+        "your_position" => your_position_hash
+    }
+
+    File.open("temp.json","w") do |f|
+      f.write(JSON.pretty_generate(tempHash))
+    end
+
+    result_from_python = `python py_ai_sample.py`
+
+    results = result_from_python.split(",")
+
+    return [results[0].to_i, results[1].to_f, results[2].to_f, results.to_s]
+
   end
 
   def get_name
