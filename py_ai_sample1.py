@@ -30,6 +30,10 @@ your_min_length = MAX_NUMBER
 your_x = MAX_NUMBER
 your_y = MAX_NUMBER
 
+
+inclination = 0
+flag = True
+
 #돌이 가장 좁게 모여있는 것의 중앙 좌표
 for your in your_position:
     for y in your_position:
@@ -39,7 +43,7 @@ for your in your_position:
             x_distance = abs(y[0] - your[0])
             y_distance = abs(y[1] - your[1])
             current_distance = math.sqrt(x_distance * x_distance + y_distance * y_distance)
-        if your_min_length> current_distance and current_distance < 120:
+        if your_min_length> current_distance and current_distance < 110:
             your_min_length = current_distance
             your_x = (y[0] + your[0])/2
             your_y = (y[1] + your[1])/2
@@ -63,37 +67,27 @@ else :
             x_distance = abs(my[0] - your[0])
             y_distance = abs(my[1] - your[1])
             current_distance = math.sqrt(x_distance * x_distance + y_distance * y_distance)
-            if min_length > current_distance:
+
+            #기울기
+            inclination = (my[1] - your[1])/(my[0] - your[0])
+
+            for m in my_position:
+                if m[0]==my[0] and m[1]==my[1]:
+                    continue
+                if inclination + 1 > (m[1] - your[1])/(m[0] - your[0]) and inclination - 1 < (m[1] - your[1])/(m[0] - your[0]):
+                    flag = False
+
+            if min_length > current_distance and flag==True:
                 current_stone_number = index
                 min_length = current_distance
                 x_length = your[0] - my[0]
                 y_length = your[1] - my[1]
+            flag=True
         index = index + 1
 
-for my in my_position:
-    for your in your_position:
-        
-# for my in my_position:
-#     for your in your_position:
-#         x_distance = abs(my[0] - your[0])
-#         y_distance = abs(my[1] - your[1])
-#         current_distance = math.sqrt(x_distance * x_distance + y_distance * y_distance)
-#         if min_length > current_distance:
-#             current_stone_number = index
-#             min_length = current_distance
-#             x_length = your[0] - my[0]
-#             y_length = your[1] - my[1]
 
-#     if your_min_length != MAX_NUMBER:
-#         x_distance = abs(my[0] - your_x)
-#         y_distance = abs(my[1] - your_y)
-#         current_distance = math.sqrt(x_distance * x_distance + y_distance * y_distance)
-#         if min_length > current_distance:
-#             current_stone_number = index
-#             min_length = current_distance
-#             x_length = your_x- my[0]
-#             y_length = your_y - my[1]
-#     index = index + 1
+
+
 
 #Return values
 message = ""
